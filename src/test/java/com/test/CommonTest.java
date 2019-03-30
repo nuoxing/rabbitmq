@@ -18,7 +18,7 @@ public class CommonTest {
 	
 	@Test
 	public void test() throws InterruptedException{
-		Sender1.sendDirectExchanage();
+		//Sender1.sendDirectExchanage();
 		//System.out.println("返回");
 		  System.out.println(Thread.currentThread().getName());
 		Thread.sleep(50000);
