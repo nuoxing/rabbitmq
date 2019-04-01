@@ -1,5 +1,6 @@
 package com.test;
 
+import com.work.service.ProductService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +26,18 @@ public class CommonTest {
 		System.out.println(Thread.currentThread().getName());
 		Thread.sleep(100000);
 	}
-	
 
+
+	@Autowired
+	com.work.service.ProductService ProductService;
+	@Autowired
+	com.work.service.ProductService2 ProductService2;
 
 	@Test
 	public void test2(){
 		try {
+			ProductService.save();
+			ProductService2.save();
 			Thread.sleep(100000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

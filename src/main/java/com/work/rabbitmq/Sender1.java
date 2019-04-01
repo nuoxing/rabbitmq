@@ -15,7 +15,7 @@ public class Sender1 {
     /**
      * 注入AmqpTemplate，然后利用AmqpTemplate向一个名为hello的消息队列中发送消息。
      */
-    @Autowired
+   // @Autowired
     private RabbitTemplate rabbitTemplate;
 
     public void send() {

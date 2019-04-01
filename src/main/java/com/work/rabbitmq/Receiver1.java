@@ -33,8 +33,8 @@ public class Receiver1 {
 	 * 收到信息 回滚 消息返回到队列中
 	 * @param
 	 */
-	@RabbitHandler
-	@RabbitListener(queues = "hello")
+	//@RabbitHandler
+	//@RabbitListener(queues = "hello")
 	public void processAndToQueue(Message message, Channel channel){
 
 		System.out.println("Receiver收到了消息:"+message.getBody());
