@@ -1,93 +1,49 @@
 package com.work.config;
 
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
- 
+
+import javax.annotation.Resource;
+
 @Configuration
 public class RabbitConfig {
-    @Bean
-    public Queue helloQueue(){
-        return new Queue("hello");
-    }
-    
-    //创建一个bean 在初始化的时候就会 往rabbitmq发送 创建一个队列
-    @Bean
-    public Queue helloQueue2(){
-    	System.out.println("1");
-        return new Queue("hello2");
-    }
 
-    
-    final static String message = "topic.message";
-    final static String messages = "topic.messages";
 
-    @Bean
-    public Queue queueMessage() {
-        return new Queue(RabbitConfig.message);
-    }
+    @Resource
+    RabbitTemplate rabbitTemplate;
 
-    @Bean
-    public Queue queueMessages() {
-        return new Queue(RabbitConfig.messages);
-    }
 
+    /**
+     * 定制化amqp模版      可根据需要定制多个
+     * <p>
+     * <p>
+     * 此处为模版类定义 Jackson消息转换器
+     * ConfirmCallback接口用于实现消息发送到RabbitMQ交换器后接收ack回调   即消息发送到exchange  ack
+     * ReturnCallback接口用于实现消息发送到RabbitMQ 交换器，但无相应队列与交换器绑定时的回调  即消息发送不到任何一个队列中  ack
+     *
+     * @return the amqp template
+     */
     @Bean
-    TopicExchange exchange() {
-        return new TopicExchange("exchange");
-    }
-
-    @Bean
-    Binding bindingExchangeMessage(Queue queueMessage, TopicExchange exchange) {
-        return BindingBuilder.bind(queueMessage).to(exchange).with("topic.message");
-    }
-
-    @Bean
-    Binding bindingExchangeMessages(Queue queueMessages, TopicExchange exchange) {
-        return BindingBuilder.bind(queueMessages).to(exchange).with("topic.#");
-    }
-    
-    @Bean
-    public Queue AMessage() {
-        return new Queue("fanout.A");
-    }
-
-    @Bean
-    public Queue BMessage() {
-        return new Queue("fanout.B");
-    }
-
-    @Bean
-    public Queue CMessage() {
-        return new Queue("fanout.C");
-    }
-
-    @Bean
-    FanoutExchange fanoutExchange() {
-        return new FanoutExchange("fanoutExchange");
-    }
-
-    @Bean
-    Binding bindingExchangeA(Queue AMessage,FanoutExchange fanoutExchange) {
-        return BindingBuilder.bind(AMessage).to(fanoutExchange);
-    }
-
-    @Bean
-    Binding bindingExchangeB(Queue BMessage, FanoutExchange fanoutExchange) {
-        return BindingBuilder.bind(BMessage).to(fanoutExchange);
-    }
-
-    @Bean
-    Binding bindingExchangeC(Queue CMessage, FanoutExchange fanoutExchange) {
-        return BindingBuilder.bind(CMessage).to(fanoutExchange);
+    public AmqpTemplate amqpTemplate() {
+        rabbitTemplate.setEncoding("UTF-8");
+        //开启returncallback
+        rabbitTemplate.setMandatory(true);
+        rabbitTemplate.setReturnCallback((message, replyCode, replyText, exchange, routingKey) -> {
+            String correlationId = message.getMessageProperties().getCorrelationIdString();
+        });
+        //        消息确认  yml 需要配置   publisher-returns: true
+        rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
+            if (ack) {
+                System.out.println("消息发送到exchange成功,id: {}");
+            } else {
+                System.out.println("消息发送到exchange失败,原因: {}"+ cause);
+            }
+        });
+        return rabbitTemplate;
     }
 
 
-
-    
 }

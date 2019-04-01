@@ -18,11 +18,24 @@ public class CommonTest {
 	
 	@Test
 	public void test() throws InterruptedException{
-		//Sender1.sendDirectExchanage();
-		//System.out.println("返回");
-		  System.out.println(Thread.currentThread().getName());
-		Thread.sleep(50000);
+		int num = 10;
+		for (int i=0;i<num;i++){
+			Sender1.sendDirectExchanage();
+		}
+		System.out.println(Thread.currentThread().getName());
+		Thread.sleep(100000);
 	}
 	
-	
+
+
+	@Test
+	public void test2(){
+		try {
+			Thread.sleep(100000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+
 }
