@@ -25,8 +25,9 @@ public class RabbitConfig2 {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public RabbitTemplate rabbitTemplate(ConnectionFactory  connectionFactory) {
-        System.out.println("34444");
-        return new RabbitTemplate(connectionFactory);
+        RabbitTemplate rabbitTemplate =  new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());//设置消息转换器 发送json格式的数据
+        return rabbitTemplate;
     }
     
  

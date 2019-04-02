@@ -58,6 +58,7 @@ public class Receiver1 {
 	//@RabbitListener(queues = "hello")
 	public void processAndAck(Message message, Channel channel){
 
+		//返回的字节数组
 		System.out.println("Receiver收到了消息:"+message.getBody());
 
 		//确认信息
