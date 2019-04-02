@@ -37,6 +37,7 @@ public class CommonTest {
 	public void test2(){
 		try {
 			ProductService.save();
+			ProductService.save();
 			ProductService2.save();
 			Thread.sleep(100000);
 		} catch (InterruptedException e) {

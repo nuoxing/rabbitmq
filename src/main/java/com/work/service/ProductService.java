@@ -37,6 +37,7 @@ public class ProductService implements  RabbitTemplate.ConfirmCallback {
 
     public void save( ) {
         //执行保存
+    	System.out.println("发送信息");
         Object msg = "hello rabbitMQ:" + new Date() + " 你好，高级消息队列使用ing~";
         String uuid = UUID.randomUUID().toString();
         CorrelationData correlationId = new CorrelationData(uuid);

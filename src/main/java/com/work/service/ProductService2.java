@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * 测试多个rabbittemplate实例  实现不同的回调函数
+ * 测试多个rabbittemplate实例  实现不同的回调函数  这种写的好处是 发送信息回调的归类
  * 说明: 继承RabbitTemplate.ConfirmCallback接口，而ConfirmCallback接口是用来回调消息发送成功后的方法，
  * 当一个消息被成功写入到RabbitMQ服务端时，会自动的回调RabbitTemplate.ConfirmCallback接口内的confirm方法完成通知
  */
@@ -18,6 +18,10 @@ public class ProductService2 implements  RabbitTemplate.ConfirmCallback {
     private RabbitTemplate rabbitTemplate;
 
 
+    /**
+     * 自动注入 prototype类型的 rabbittemplate
+     * @param rabbitTemplate
+     */
     public ProductService2(RabbitTemplate rabbitTemplate){
         System.out.println("调用了");
         this.rabbitTemplate=rabbitTemplate;

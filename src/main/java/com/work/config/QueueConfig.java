@@ -16,9 +16,6 @@ public class QueueConfig {
         return new Queue("hello");
     }
 
-
-
-
     @Bean
     public Queue queueMessage() {
         return new Queue(QueueConfig.message);

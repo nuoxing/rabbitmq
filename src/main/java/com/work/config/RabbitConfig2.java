@@ -22,7 +22,7 @@ public class RabbitConfig2 {
      */
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public RabbitTemplate rabbitTemplate(@Autowired ConnectionFactory  connectionFactory) {
+    public RabbitTemplate rabbitTemplate(ConnectionFactory  connectionFactory) {
         System.out.println("34444");
         return new RabbitTemplate(connectionFactory);
     }
