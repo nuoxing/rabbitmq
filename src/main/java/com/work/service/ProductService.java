@@ -16,57 +16,71 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * 测试多个rabbittemplate实例  实现不同的回调函数
- * 说明: 继承RabbitTemplate.ConfirmCallback接口，而ConfirmCallback接口是用来回调消息发送成功后的方法，
+ * 测试多个rabbittemplate实例 实现不同的回调函数 说明:
+ * 继承RabbitTemplate.ConfirmCallback接口，而ConfirmCallback接口是用来回调消息发送成功后的方法，
  * 当一个消息被成功写入到RabbitMQ服务端时，会自动的回调RabbitTemplate.ConfirmCallback接口内的confirm方法完成通知
  */
 @Service
-public class ProductService implements  RabbitTemplate.ConfirmCallback {
+public class ProductService implements RabbitTemplate.ConfirmCallback {
 
+	// rabbitmqtemplate是不是单例 所以不能在这使用注解注入
+	private RabbitTemplate rabbitTemplate;
 
-    //rabbitmqtemplate是不是单例 所以不能在这使用注解注入
-    private RabbitTemplate rabbitTemplate;
+	public ProductService(RabbitTemplate rabbitTemplate) {
+		System.out.println("调用了");
+		this.rabbitTemplate = rabbitTemplate;
+		this.rabbitTemplate.setConfirmCallback(this);
+	}
 
+	public void confirm(CorrelationData correlationData, boolean ack, String cause) {
+		System.out.println(" 消息id:" + correlationData);
+		if (ack) {
+			System.out.println("消息发送确认成功");
+		} else {
+			System.out.println("消息发送确认失败:" + cause);
+		}
+	}
 
-    public ProductService(RabbitTemplate rabbitTemplate){
-        System.out.println("调用了");
-        this.rabbitTemplate=rabbitTemplate;
-        this.rabbitTemplate.setConfirmCallback(this);
-    }
+	public void save() {
+		// 执行保存
+		System.out.println("发送信息");
+		Object msg = "hello rabbitMQ:" + new Date() + " 你好，高级消息队列使用ing~";
+		String uuid = UUID.randomUUID().toString();
+		CorrelationData correlationId = new CorrelationData(uuid);
+		this.rabbitTemplate.convertAndSend("hello", msg, correlationId);
+	}
 
-    public void confirm(CorrelationData correlationData, boolean ack, String cause) {
-        System.out.println(" 消息id:" + correlationData);
-        if (ack) {
-            System.out.println("消息发送确认成功");
-        } else {
-            System.out.println("消息发送确认失败:" + cause);
-        }
-    }
+	@Autowired
+	private ObjectMapper objectMapper;
 
+	/**
+	 * 使用Message对象发送消息 json格式的数据
+	 */
+	public void sendMessageByVo() throws Exception {
+		User user = new User();
+		user.setCerno("9ifdfd");
+		user.setName("测试");
+		Message message = MessageBuilder.withBody(objectMapper.writeValueAsBytes(user))
+				.setDeliveryMode(MessageDeliveryMode.PERSISTENT).build();
+		message.getMessageProperties().setHeader(AbstractJavaTypeMapper.DEFAULT_CONTENT_CLASSID_FIELD_NAME,
+				MessageProperties.CONTENT_TYPE_JSON);
+		String uuid = UUID.randomUUID().toString();
+		CorrelationData correlationId = new CorrelationData(uuid);
+		rabbitTemplate.convertAndSend("hello2", message,correlationId);
 
-    public void save( ) {
-        //执行保存
-    	System.out.println("发送信息");
-        Object msg = "hello rabbitMQ:" + new Date() + " 你好，高级消息队列使用ing~";
-        String uuid = UUID.randomUUID().toString();
-        CorrelationData correlationId = new CorrelationData(uuid);
-        this.rabbitTemplate.convertAndSend("hello", msg, correlationId);
-    }
+	}
+	
+	/**
+	 * 使用Message对象发送消息 json格式的数据
+	 */
+	public void sendUser() throws Exception {
+		User user = new User();
+		user.setCerno("9ifdfd");
+		user.setName("测试");
+		
+		String uuid = UUID.randomUUID().toString();
+		CorrelationData correlationId = new CorrelationData(uuid);
+		rabbitTemplate.convertAndSend("hello2", user,correlationId);
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    /**
-     * 使用Message对象发送消息 json格式的数据
-     */
-    public void sendMessageByVo() throws Exception{
-        User user = new User();
-        user.setCerno("9ifdfd");
-        user.setName("测试");
-        Message message= MessageBuilder.withBody(objectMapper.writeValueAsBytes(user)).setDeliveryMode(MessageDeliveryMode.PERSISTENT).build();
-        message.getMessageProperties().setCorrelationIdString(UUID.randomUUID().toString());
-        message.getMessageProperties().setHeader(AbstractJavaTypeMapper.DEFAULT_CONTENT_CLASSID_FIELD_NAME, MessageProperties.CONTENT_TYPE_JSON);
-        rabbitTemplate.convertAndSend("hello",message);
-
-    }
+	}
 }
