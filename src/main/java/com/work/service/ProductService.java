@@ -1,7 +1,14 @@
 package com.work.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.work.entity.User;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageDeliveryMode;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.support.CorrelationData;
+import org.springframework.amqp.support.converter.AbstractJavaTypeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +23,8 @@ import java.util.UUID;
 @Service
 public class ProductService implements  RabbitTemplate.ConfirmCallback {
 
+
+    //rabbitmqtemplate是不是单例 所以不能在这使用注解注入
     private RabbitTemplate rabbitTemplate;
 
 
@@ -42,5 +51,22 @@ public class ProductService implements  RabbitTemplate.ConfirmCallback {
         String uuid = UUID.randomUUID().toString();
         CorrelationData correlationId = new CorrelationData(uuid);
         this.rabbitTemplate.convertAndSend("hello", msg, correlationId);
+    }
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    /**
+     * 使用Message对象发送消息 json格式的数据
+     */
+    public void sendMessageByVo() throws Exception{
+        User user = new User();
+        user.setCerno("9ifdfd");
+        user.setName("测试");
+        Message message= MessageBuilder.withBody(objectMapper.writeValueAsBytes(user)).setDeliveryMode(MessageDeliveryMode.PERSISTENT).build();
+        message.getMessageProperties().setCorrelationIdString(UUID.randomUUID().toString());
+        message.getMessageProperties().setHeader(AbstractJavaTypeMapper.DEFAULT_CONTENT_CLASSID_FIELD_NAME, MessageProperties.CONTENT_TYPE_JSON);
+        rabbitTemplate.convertAndSend("hello",message);
+
     }
 }
