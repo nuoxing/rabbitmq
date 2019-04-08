@@ -61,6 +61,7 @@ public class ProductService implements RabbitTemplate.ConfirmCallback {
 		user.setCerno("9ifdfd");
 		user.setName("测试");
 		Message message = MessageBuilder.withBody(objectMapper.writeValueAsBytes(user))
+				//设置消息持久化
 				.setDeliveryMode(MessageDeliveryMode.PERSISTENT).build();
 		message.getMessageProperties().setHeader(AbstractJavaTypeMapper.DEFAULT_CONTENT_CLASSID_FIELD_NAME,
 				MessageProperties.CONTENT_TYPE_JSON);

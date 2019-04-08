@@ -21,7 +21,7 @@ public class ProductService2 implements RabbitTemplate.ConfirmCallback {
 	 * 自动注入 prototype类型的 rabbittemplate
 	 * 
 	 * @param rabbitTemplate
-	 */
+	    */
 	public ProductService2(RabbitTemplate rabbitTemplate) {
 		System.out.println("调用了");
 		this.rabbitTemplate = rabbitTemplate;
