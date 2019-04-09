@@ -17,7 +17,7 @@ public class ReceiverTest {
 	
 	@Test
 	public void test() throws InterruptedException{
-		Thread.sleep(100000);
+		Thread.sleep(1000000);
 	}
 
 

@@ -15,7 +15,7 @@ public class ReceiverUser {
 
 	
 	/**
-	 * 指定containerFactory 它 listener容器
+	 * 指定containerFactory 它 listener容器   一个监听器代表一个消费者
 	 * @param msg
 	 */
     @RabbitHandler

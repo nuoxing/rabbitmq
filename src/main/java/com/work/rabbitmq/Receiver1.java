@@ -2,13 +2,15 @@ package com.work.rabbitmq;
 
 import java.io.IOException;
 
-import com.rabbitmq.client.Channel;
-import com.work.entity.User;
-
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+
+import com.rabbitmq.client.Channel;
 
 @Component
 public class Receiver1 {
@@ -54,7 +56,7 @@ public class Receiver1 {
 	 * @param
 	 */
 	// @RabbitHandler
-	// @RabbitListener(queues = "hello")
+	//@RabbitListener(queues = "hello")
 	public void processAndAck(Message message, Channel channel) {
 
 		// 返回的字节数组
@@ -70,6 +72,25 @@ public class Receiver1 {
 	}
 	
 	
+	/**
+	 * 
+	 * @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "roberto.order.add", durable = "true", autoDelete = "false", exclusive = "false"), exchange = @Exchange(name = "roberto.order"))})
+	 * 通过 @RabbitListener 的 bindings 属性声明 Binding（若 RabbitMQ 中不存在该绑定所需要的 Queue、Exchange、RouteKey 则自动创建，若存在（不是这里绑定创建的意思,例如其他创建了的bean获取启动了多个实例）则抛出异常）
+	 * 所以 一般情况下 不使用这个方法绑定 
+	 */
+	//@RabbitHandler
+   // @RabbitListener(bindings = {@QueueBinding(value = @Queue(value ="aaa", durable = "true", autoDelete = "false", exclusive = "true"), exchange = @Exchange(value = "fanoutExchange3",type="fanout"))})
+	public void guangbo(Message message, Channel channel){
+		// 返回的字节数组
+		System.out.println("Receiver1收到了消息:" + message.getBody());
+
+		// 确认信息
+		try {
+			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 
 }
